@@ -1,0 +1,20 @@
+package Main_pkg;
+
+public class constants {
+	
+	//Menu messages
+	public static final String msg_welc = "******************************\n"
+			+ "===Welcome to Car Parts System!===\n"
+			+ "choose the relevent option \n"
+			+ "by passing the number from the shown list\n"
+			+ "*******************************";
+	public static final String msg_menu = "===Main menu===\n"
+			+ "1. Show parts in database\n"
+			+ "2. Upload new database\n"
+			+ "3. Reset database";
+	
+	//Menu numbers
+	public static final int mnu_main = 0;
+	public static final int mnu_parts = 1;
+	public static final int mnu_2 = 2;
+}

@@ -1,0 +1,12 @@
+package Main_pkg;
+
+public class constants {
+	
+	public static final String msg_welc = "********************\n"
+			+ "===Welcome to Auto Parts!===\n"
+			+ "*********************";
+	
+	public static final int mnu_main = 0;
+	public static final int mnu_parts = 1;
+	public static final int mnu_2 = 2;
+}

@@ -12,25 +12,18 @@ public class car_parts_system {
 			int curr_menu = 0;
 			
 			//Print application start message.
-			System.out.println("************************");
-			System.out.println("Welcome to Auto Parts!");
-			System.out.println("************************");
+			System.out.println(constants.msg_welc);
 			
-			//Start the App.
+			//Start the application.
 			while(isRunning) {
 				switch (curr_menu) {
-					case 0:
-						output_handler.read_file("main.txt");
+					case constants.mnu_main:
+						System.out.println(constants.msg_menu);
 						curr_menu = scan.nextInt();
 						break;
 						
-					case 1:
-						System.out.println("Parts category");
-						curr_menu = scan.nextInt();
-						break;
-						
-					case 2:
-						System.out.println("Vehicles");
+					case constants.mnu_parts:
+						System.out.println(constants.msg_parts);
 						curr_menu = scan.nextInt();
 						break;
 						
