@@ -1,0 +1,102 @@
+package Main_pkg;
+
+import java.util.Scanner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.File;
+
+public class CarPartsSystem {
+	
+	public static Scanner scan = new Scanner(System.in);
+	
+	public static void main(String[] args) throws IOException {
+		
+			boolean isRunning = true;
+			int curr_menu = 0;
+			
+			Configurations curr_configs = new Configurations();
+			ObjectMapper mapper = new ObjectMapper();
+			File conf_file = null;			
+			FilesHandler files_handler = new FilesHandler(curr_configs, mapper, conf_file);
+			
+			//Print application welcome message.
+			System.out.println(Constants.msg_welc);
+			
+			//Initiate configuration file
+			files_handler.conf_initiation();
+			
+			//Start the application.
+			while(isRunning) {
+				switch (curr_menu) {
+					case Constants.mnu_main:
+						System.out.println(Constants.msg_menu);
+						curr_menu = scan.nextInt();
+						console_clear();
+						break;
+						
+					case Constants.mnu_parts:
+						files_handler.data_file_init();
+						parts_options();
+						curr_menu = 0;
+						console_clear();
+						break;
+						
+					default:
+						System.out.println("Incorrect input");
+						curr_menu = 0;
+						console_clear();
+						break;
+				}
+				
+			}
+			
+			scan.close();
+
+		}
+	
+	private static void console_clear() {
+		for(int i=0; i<50; i++) System.out.println();
+	}
+	
+	private static void parts_options() {
+		boolean return_to_main = false;
+		int option = Integer.MAX_VALUE;
+		String read_line;
+		
+		scan.nextLine();
+		
+		while(return_to_main == false) {
+			read_line = scan.nextLine();
+			
+			if(read_line.isEmpty()) {
+				return_to_main = true;
+			}else {
+				try {
+					option = Integer.parseInt(read_line);
+				} catch (NumberFormatException e) {
+					return_to_main = true;
+				}
+			}
+			switch (option) {
+				case Constants.part_add:
+					//Adding part to the database
+					break;
+				case Constants.part_remov:
+					//Remove part from the database
+					break;
+				case Constants.page_next:
+					//Show next page of the database
+					break;
+				case Constants.page_prev:
+					//Show previous page of the database
+					break;
+				default:
+					//return to main menu
+					System.out.println("Invalid option number\n");
+					break;
+			}
+		}
+	}
+}

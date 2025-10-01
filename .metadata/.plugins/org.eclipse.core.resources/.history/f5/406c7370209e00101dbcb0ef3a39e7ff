@@ -1,0 +1,18 @@
+package Main_pkg;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class Extractor {
+	
+	private Configurations curr_configs;
+	private ObjectMapper mapper;
+	
+	public Extractor() {}
+	
+	public Extractor(Configurations curr_configs, ObjectMapper mapper) {
+		
+		this.curr_configs = curr_configs;
+		this.mapper = mapper;
+		
+	}
+}

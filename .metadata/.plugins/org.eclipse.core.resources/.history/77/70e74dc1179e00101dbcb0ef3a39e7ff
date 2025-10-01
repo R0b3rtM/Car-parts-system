@@ -1,0 +1,23 @@
+package Main_pkg;
+
+public class constants {
+	
+	public static final String def_data_file = "default_database.json";
+	public static final String def_conf_file = "config.json";
+	
+	//Menu messages
+	public static final String msg_welc = "******************************\n"
+			+ "===Welcome to Car Parts System!===\n"
+			+ "choose the relevent option \n"
+			+ "by passing the number from the shown list\n"
+			+ "*******************************";
+	public static final String msg_menu = "===Main menu===\n"
+			+ "1. Show parts in database\n"
+			+ "2. Upload new database\n"
+			+ "3. Reset database";
+	public static final String msg_parts = "CN: 000-000-000 | part: xxx | manufacturer: xxx | models: xxx | year: 0000";
+	
+	//Menu numbers
+	public static final int mnu_main = 0;
+	public static final int mnu_parts = 1;
+}

@@ -1,0 +1,11 @@
+package Main_pkg;
+
+public class Part {
+	
+	public int cn;
+	public int year;
+	public String part_name;
+	public String part_man;
+	public String[] compt_vehicles;
+	
+}

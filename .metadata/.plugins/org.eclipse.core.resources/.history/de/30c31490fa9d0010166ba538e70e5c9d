@@ -1,0 +1,70 @@
+package Main_pkg;
+
+
+
+import java.util.Scanner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+
+public class car_parts_system {
+	
+	public static Scanner scan = new Scanner(System.in);
+	
+	public static void main(String[] args) {
+		
+			boolean isRunning = true;
+			int curr_menu = 0;
+			
+			//Check if the config Json file exists
+			if(!Files.exists(Paths.get("config.json"))) {
+				//Create new settings instance
+				settings def_settings = new settings(constants.def_data_file);
+				
+				//Create ObjectMapper
+				ObjectMapper mapper = new ObjectMapper();
+				
+				//Handling errors while creating a new Json file
+				try {
+					mapper.writerWithDefaultPrettyPrinter().writeValue(new File(constants.def_conf_file), def_settings);
+					
+				} catch(IOException e) {
+					System.out.println(e.getMessage());
+				}
+				
+			}
+			//List<String> file_lines = Files.readAllLines(Paths.get(null));
+			
+			//Print application start message.
+			System.out.println(constants.msg_welc);
+			
+			//Start the application.
+			while(isRunning) {
+				switch (curr_menu) {
+					case constants.mnu_main:
+						System.out.println(constants.msg_menu);
+						curr_menu = scan.nextInt();
+						break;
+						
+					case constants.mnu_parts:
+						System.out.println(constants.msg_parts);
+						curr_menu = scan.nextInt();
+						break;
+						
+					default:
+						System.out.println("Incorrect input");
+						curr_menu = 0;
+						break;
+				}
+				
+			}
+			
+			scan.close();
+
+		}
+	}

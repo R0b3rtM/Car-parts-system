@@ -1,0 +1,72 @@
+package Main_pkg;
+
+import java.util.Scanner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.io.File;
+
+public class CarPartsSystem {
+	
+	public static Scanner scan = new Scanner(System.in);
+	
+	public static void main(String[] args) throws IOException {
+		
+			boolean isRunning = true;
+			int curr_menu = 0;
+			
+			Configurations curr_configs = new Configurations();
+			ObjectMapper mapper = new ObjectMapper();
+			File conf_file = null;			
+			FilesHandler files_handler = new FilesHandler(curr_configs, mapper, conf_file);
+			//Extractor extractor = new Extractor(curr_configs, mapper);
+			
+			//Print application welcome message.
+			System.out.println(Constants.msg_welc);
+			
+			//Initiate configuration file
+			files_handler.conf_initiation();
+			
+			//List<String> file_lines = Files.readAllLines(Paths.get(null));
+			
+			//Start the application.
+			while(isRunning) {
+				switch (curr_menu) {
+					case Constants.mnu_main:
+						System.out.println(Constants.msg_menu);
+						curr_menu = scan.nextInt();
+						console_clear();
+						break;
+						
+					case Constants.mnu_parts:
+						files_handler.data_file_init();
+						curr_menu = scan.nextInt();
+						break;
+						
+					default:
+						System.out.println("Incorrect input");
+						curr_menu = 0;
+						break;
+				}
+				
+			}
+			
+			scan.close();
+
+		}
+	
+	private static void console_clear() {
+		for(int i=0; i<50; i++) System.out.println();
+	}
+	
+	private void parts_options() {
+		int option = scan.nextInt();
+		
+		switch (option) {
+			case Constants.part_add:
+				//Adding part to the database
+				break;
+		}
+	}
+}

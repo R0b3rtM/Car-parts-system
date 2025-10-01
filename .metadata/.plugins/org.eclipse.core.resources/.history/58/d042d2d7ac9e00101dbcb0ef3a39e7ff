@@ -1,0 +1,23 @@
+package Main_pkg;
+
+import java.util.List;
+
+public class Part {
+	
+	private int cn;
+	private int year;
+	private String part_name;
+	private String part_man;
+	private List<String> compt_vehicles;
+	
+	public Part() {}
+	
+	public Part (int cn, int year, String part_name, String part_man, List<String> compt_vehicles) {
+		this.cn = cn;
+		this.year = year;
+		this.part_name = part_name;
+		this.part_man = part_man;
+		this.compt_vehicles = compt_vehicles;
+	}
+	
+}

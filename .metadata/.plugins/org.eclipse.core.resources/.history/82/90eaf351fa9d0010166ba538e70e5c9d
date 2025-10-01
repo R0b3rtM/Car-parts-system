@@ -1,0 +1,17 @@
+package Main_pkg;
+
+public class settings {
+	
+	private String file;
+	
+	//Default constructor (required by Jackson)
+	public settings() {}
+	
+	public settings(String file) {
+		this.file = file;
+	}
+	
+	public void set_conf_file(String file) {
+		this.file = file;
+	}
+}

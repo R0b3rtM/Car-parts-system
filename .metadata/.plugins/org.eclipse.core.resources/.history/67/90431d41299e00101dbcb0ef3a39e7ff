@@ -1,0 +1,40 @@
+package Main_pkg;
+
+import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class Extractor {
+	
+	private Configurations curr_configs;
+	private ObjectMapper mapper;
+	private List<Part> parts;
+	
+	public Extractor() {}
+	
+	public Extractor(Configurations curr_configs, ObjectMapper mapper) {
+		
+		this.curr_configs = curr_configs;
+		this.mapper = mapper;
+		
+	}
+	
+	public void show_data_file() {
+		String data_file_name = curr_configs.getDataFile().getName();
+		
+		System.out.println("===" + data_file_name + "===");
+		System.out.println(Constants.msg_parts);
+		
+		if(parts.isEmpty()) {
+			System.out.println("The database is empty");
+		}else {
+			//Prints the content of the database
+		}
+		
+		System.out.println(Constants.msg_menu_parts);
+	}
+	
+	public void upload_parts() {
+		//Upload parts in to parts list from the Json data file
+	}
+}
