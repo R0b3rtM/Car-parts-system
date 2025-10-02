@@ -1,0 +1,108 @@
+package Main_pkg;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class FilesHandler {
+	
+	private Configurations curr_configs;
+	private ObjectMapper mapper;
+	private File conf_file;
+	
+	private List<Part> parts;
+	
+	public FilesHandler(){
+		this.curr_configs = new Configurations();
+		this.mapper = new ObjectMapper();
+		
+		this.parts = new ArrayList<>();
+	}
+	
+	public void conf_initiation() {
+		
+		if(!Files.exists(Paths.get(Constants.def_conf_file))) {
+			//Create new Json configuration file 
+			conf_file = new File(Constants.def_conf_file);
+			//Set the default config file
+			curr_configs.setFile(conf_file);
+			save_configs();
+			
+		}else {
+			//If the file exists, copy the content to Configurations instance.
+			conf_file = Paths.get(Constants.def_conf_file).toFile();
+			try {
+				curr_configs = mapper.readValue(conf_file, Configurations.class);
+			} catch(IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	
+	public void data_file_init() {
+		
+		//Extract the data file from configurations file
+		File data_file = curr_configs.getDataFile();
+		//Create default data file if is not exist
+		if(data_file == null) {
+			data_file = new File(Constants.def_data_file);
+			curr_configs.setDataFile(data_file);
+			save_configs();
+			
+		}else {
+			//Upload the data file
+			show_data_file();
+		}
+			
+	}
+	
+	public void show_data_file() {
+		String data_file_name = curr_configs.getDataFile().getName();
+		
+		System.out.println("===" + data_file_name + "===");
+		System.out.println(Constants.msg_parts);
+		
+		//Upload parts in to parts list from the Json data file
+		try{
+			parts = Arrays.asList(mapper.readValue(curr_configs.getDataFile(), Part.class));
+			//Prints the content of the database
+			parts.get(0).printPartData();
+		} catch(IOException e) {
+			//Error with passing values from data file
+			if(parts.isEmpty())
+				System.out.println("The database is empty");
+		}
+		
+		System.out.println(Constants.msg_menu_parts);
+	}
+	
+	public void add_part_to_database(Part part, File data_file) {
+		try (FileWriter fw = new FileWriter(data_file)){
+			fw.write(mapper.writeValueAsString(part));
+			fw.write("\n");
+			
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public File getDataFile() {
+		return curr_configs.getDataFile();
+	}
+	
+	private void save_configs() {
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(conf_file, curr_configs);
+			
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+}

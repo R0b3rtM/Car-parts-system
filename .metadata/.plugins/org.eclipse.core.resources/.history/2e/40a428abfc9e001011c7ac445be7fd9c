@@ -1,0 +1,22 @@
+package Main_pkg;
+
+import java.util.Scanner;
+
+public class CarPartsSystem {
+	
+	public static FilesHandler files_handler = new FilesHandler();
+	
+	public static void main(String[] args) {
+			
+			//Print application welcome message.
+			System.out.println(Constants.msg_welc);
+			
+			//Initiate configuration file
+			files_handler.conf_initiation();
+			
+			//Start the application.
+			UserInterface.main_menu_interface();
+
+		}
+
+}

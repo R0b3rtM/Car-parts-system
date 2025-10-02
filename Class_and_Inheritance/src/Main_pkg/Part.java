@@ -2,16 +2,20 @@ package Main_pkg;
 
 public class Part {
 	
-	public String cn, year, part_name, part_man, vehicle_model;
+	public String cn, part_name, part_man, vehicle_model, year;
 	
 	public Part() {}
 	
-	public Part (String cn, String year, String part_name, String part_man, String vehicle_model) {
+	public Part (String cn, String part_name, String part_man, String vehicle_model, String year) {
 		this.cn = cn;
 		this.year = year;
 		this.part_name = part_name;
 		this.part_man = part_man;
 		this.vehicle_model = vehicle_model;
+	}
+	
+	public void printPartData() {
+		System.out.println("    " + cn + " - " + part_name + " - " + part_man + " - " + vehicle_model + " - " + year);
 	}
 	
 }

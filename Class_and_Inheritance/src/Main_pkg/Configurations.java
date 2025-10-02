@@ -5,7 +5,7 @@ import java.io.File;
 public class Configurations {
 	
 	private File file;
-	private File data_file;
+	private String db_file_url;
 	
 	//Default constructor (required by Jackson)
 	public Configurations() {}
@@ -22,11 +22,11 @@ public class Configurations {
 		return file;
 	}
 	
-	public void setDataFile(File data_file) {
-		this.data_file = data_file;
+	public void setDataFile(String db_url) {
+		this.db_file_url = db_url;
 	}
 	
-	public File getDataFile() {
-		return data_file;
+	public String getDataFile() {
+		return db_file_url;
 	}
 }

@@ -1,11 +1,17 @@
 package Main_pkg;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,14 +23,16 @@ public class FilesHandler {
 	
 	private List<Part> parts;
 	
-	public FilesHandler() {}
-	
-	public FilesHandler(Configurations curr_configs, ObjectMapper mapper, File conf_file){
-		this.curr_configs = curr_configs;
-		this.mapper = mapper;
-		this.conf_file = conf_file;
+	public FilesHandler(){
+		this.curr_configs = new Configurations();
+		this.mapper = new ObjectMapper();
 		
 		this.parts = new ArrayList<>();
+	}
+	
+	public void setDataFile(String new_url) {
+		curr_configs.setDataFile(new_url);
+		save_configs();
 	}
 	
 	public void conf_initiation() {
@@ -49,47 +57,109 @@ public class FilesHandler {
 	
 	public void data_file_init() {
 		
-		//Extract the data file from configurations file
-		File data_file = curr_configs.getDataFile();
-		//Create default data file if is not exist
-		if(data_file == null) {
-			data_file = new File(Constants.def_data_file);
-			curr_configs.setDataFile(data_file);
-			save_configs();
-			
+		//Setting the database file url
+		String db_file_name = curr_configs.getDataFile(), db_url;
+		
+		if(db_file_name == null) {
+			db_url = "jdbc:sqlite:" + Constants.def_db_file + ".db";
+			setDataFile(Constants.def_db_file);
 		}else {
-			//Upload the data file
-			show_data_file();
+			db_url = "jdbc:sqlite:" + db_file_name + ".db";
+		}
+		//Connect to the database
+		try (Connection conn = DriverManager.getConnection(db_url)){
+
+			//Create a table in the database
+			Statement stmt = conn.createStatement();
+			stmt.execute("CREATE TABLE IF NOT EXISTS parts (" +
+								"CN TEXT," +
+								"Type TEXT," +
+								"Manufacturer TEXT," +
+								"Models TEXT," +
+								"Year TEXT" +
+								");");
+				
+			show_data_file(conn, stmt);
+				
+		} catch (SQLException e) {
+			System.out.println("SQLite Error: " + e.getMessage());
 		}
 			
 	}
 	
-	public void show_data_file() {
-		String data_file_name = curr_configs.getDataFile().getName();
+	private void show_data_file(Connection conn, Statement stmt) {		
+		int row_counts;
 		
-		System.out.println("===" + data_file_name + "===");
-		System.out.println(Constants.msg_parts);
+		System.out.println("===" + curr_configs.getDataFile() + "===");
+		System.out.println(Constants.msg_parts);	
 		
-		if(parts.isEmpty()) {
-			System.out.println("The database is empty");
-		}else {
-			//Prints the content of the database
+		try {
+			
+			ResultSet rs_count = stmt.executeQuery("SELECT COUNT(*) AS total FROM parts");
+			if(rs_count.next()) {
+				row_counts = rs_count.getInt("total");
+				
+				//Check if the table is empty
+				if(row_counts == 0) {
+					System.out.println("The database is empty");
+				}else {
+					ResultSet rs = stmt.executeQuery("SELECT * FROM parts");
+					//Upload parts in to parts list from the database
+					while(rs.next()) {
+						String cn = rs.getString("CN");
+						String type = rs.getString("Type");
+						String man = rs.getString("Manufacturer");
+						String model = rs.getString("Models");
+						String year = rs.getString("Year");
+						
+						parts.add(new Part(cn, type, man, model, year));
+					}
+					
+					//Print the database content
+					for(Part part : parts) {
+						part.printPartData();
+					}
+					
+					parts.clear();
+				}
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("SQLite Error: " + e.getMessage());
 		}
 		
 		System.out.println(Constants.msg_menu_parts);
 	}
 	
-	public void add_part_to_database(Part part, File data_file) {
-		try {
-			mapper.writerWithDefaultPrettyPrinter().writeValue(data_file, part);
+	public void add_part_to_database(String[] part_info) {
+		
+		String db_url = "jdbc:sqlite:" + curr_configs.getDataFile() + ".db";
+		
+		try (Connection conn = DriverManager.getConnection(db_url)){
 			
-		} catch(IOException e) {
-			System.out.println(e.getMessage());
+			PreparedStatement pstmt = conn.prepareStatement("INSERT INTO parts (CN, Type, Manufacturer, Models, Year) VALUES (?, ?, ?, ?, ?)");
+			for(int i = 0; i<5; i++) {
+				pstmt.setString(i+1, part_info[i]);
+			}
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			System.out.println("SQLite Error: " + e.getMessage());
 		}
 	}
 	
-	public File getDataFile() {
-		return curr_configs.getDataFile();
+	public void remove_part_from_database(String cn) {
+		String db_url = "jdbc:sqlite:" + curr_configs.getDataFile() + ".db";
+		
+		try (Connection conn = DriverManager.getConnection(db_url)){
+			
+			PreparedStatement pstmt = conn.prepareStatement("DELETE FROM parts WHERE CN = ?");
+			pstmt.setString(1, cn);
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			System.out.println("SQLite Error: " + e.getMessage());
+		}
 	}
 	
 	private void save_configs() {

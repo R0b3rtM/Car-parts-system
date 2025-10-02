@@ -1,0 +1,24 @@
+package Main_pkg;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class Extractor {
+	
+	public Extractor() {}
+	
+	public static void upload_parts(File data_file, List<Part> parts) {
+		ObjectMapper mapper = new ObjectMapper();
+		
+		//Upload parts in to parts list from the Json data file
+		try{
+			parts = Arrays.asList(mapper.readValue(data_file, Part.class));
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+}

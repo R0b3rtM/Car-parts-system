@@ -1,0 +1,138 @@
+package Main_pkg;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.Scanner;
+
+public class UserInterface {
+	
+	public static FilesHandler files_handler = new FilesHandler();
+	public static Scanner scan = new Scanner(System.in);
+	
+	public static void main_menu_interface() {
+		boolean isRunning = true;
+		int curr_menu = 0;
+		
+		//Initiate configuration file
+		files_handler.conf_initiation();
+		
+		while(isRunning) {
+			switch (curr_menu) {
+				case Constants.mnu_main:
+					System.out.println(Constants.msg_menu);
+					curr_menu = scan.nextInt();
+					console_clear();
+					break;
+					
+				case Constants.mnu_parts:
+					parts_database_interface();
+					curr_menu = 0;
+					console_clear();
+					break;
+					
+				case Constants.database_upload:
+					//Upload new database
+					upload_database_interface();
+					break;
+					
+				case Constants.database_reset:
+					//Reset to default database
+					break;
+					
+				default:
+					System.out.println("Incorrect input");
+					curr_menu = 0;
+					console_clear();
+					break;
+			}
+			
+		}
+		scan.close();
+	}
+	
+	private static void upload_database_interface() {
+		String read_line;
+		File new_data_file;
+		
+		System.out.println(Constants.msg_database_upload);
+		read_line = scan.nextLine();
+		
+		if(read_line.contains(".json")) {
+			new_data_file = new File(Paths.get(read_line).toString());
+			files_handler.setDataFile(new_data_file);		
+		}
+		
+		console_clear();
+	}
+
+	private static void parts_database_interface() {
+		boolean return_to_main = false;
+		int option = Integer.MAX_VALUE;
+		String read_line;
+		
+		//consume the leftover '\n' that left from the 'nextInt()'
+		scan.nextLine();
+		
+		while(return_to_main == false) {
+			//Initiate data file/ upload data file
+			files_handler.data_file_init();
+			
+			//Get input from user
+			read_line = scan.nextLine();
+			
+			//Process the input
+			if(read_line.isEmpty()) {
+				return_to_main = true;
+			}else {
+				try {
+					option = Integer.parseInt(read_line);
+				} catch (NumberFormatException e) {
+					return_to_main = true;
+				}
+			}
+			
+			//Option choose
+			switch (option) {
+				case Constants.part_add:
+					//Adding part to the database
+					add_part();
+					break;
+				case Constants.part_remov:
+					//Remove part from the database
+					break;
+				case Constants.page_next:
+					//Show next page of the database
+					break;
+				case Constants.page_prev:
+					//Show previous page of the database
+					break;
+				default:
+					//return to main menu
+					System.out.println("Invalid option number\n");
+					break;
+			}
+		}
+		console_clear();
+	}
+	
+	private static void add_part() {
+		
+		String[] part_info = new String[5];
+		String read_line;
+		
+		//Start user dialog to get the part info
+		for(int i = 0; i<5; i++) {
+			System.out.println("Enter the " + Constants.part_info[i] + ": ");
+			read_line = scan.nextLine();
+			part_info[i] = read_line;
+		}
+		
+		Part new_part = new Part(part_info[0], part_info[1], part_info[2], part_info[3], part_info[4]);
+		files_handler.add_part_to_database(new_part, files_handler.getDataFile());
+		
+	}
+	
+	private static void console_clear() {
+		for(int i=0; i<50; i++) System.out.println();
+	}
+}

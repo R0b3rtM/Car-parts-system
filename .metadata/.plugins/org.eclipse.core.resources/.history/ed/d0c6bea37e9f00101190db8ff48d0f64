@@ -1,0 +1,160 @@
+package Main_pkg;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.SQLException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class FilesHandler {
+	
+	private Configurations curr_configs;
+	private ObjectMapper mapper;
+	private File conf_file;
+	
+	private List<Part> parts;
+	
+	public FilesHandler(){
+		this.curr_configs = new Configurations();
+		this.mapper = new ObjectMapper();
+		
+		this.parts = new ArrayList<>();
+	}
+	
+	public void setDataFile(File new_data_file) {
+		curr_configs.setDataFile(new_data_file);
+		save_configs();
+	}
+	
+	public void findPart(String cn) {
+		
+	}
+	
+	public void conf_initiation() {
+		
+		if(!Files.exists(Paths.get(Constants.def_conf_file))) {
+			//Create new Json configuration file 
+			conf_file = new File(Constants.def_conf_file);
+			//Set the default config file
+			curr_configs.setFile(conf_file);
+			save_configs();
+			
+		}else {
+			//If the file exists, copy the content to Configurations instance.
+			conf_file = Paths.get(Constants.def_conf_file).toFile();
+			try {
+				curr_configs = mapper.readValue(conf_file, Configurations.class);
+			} catch(IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+	}
+	
+	public void data_file_init() {
+		
+		//Extract the data file from configurations file
+		File data_file = curr_configs.getDataFile();
+		//Create default data file if is not exist
+		if(data_file == null) {
+			data_file = new File(Constants.def_data_file);
+			curr_configs.setDataFile(data_file);
+			save_configs();
+			
+		}else {
+			//Upload the data file
+			show_data_file();
+		}
+		
+		//Setting the database file url
+		String db_url = curr_configs.db_file_url;
+		
+		if(db_url == null)
+			db_url = Constants.def_db_file;
+		//Connect to the database
+		try (Connection conn = DriverManager.getConnection(db_url)){
+			if(conn != null) {
+				System.out.println("Connected to SQLite!\n");
+				
+				//Create a table in the database
+				Statement stmt = conn.createStatement();
+				stmt.execute("CREATE TABLE IF NOT EXISTS parts (" +
+								"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+								"cn TEXT," +
+								"part_name TEXT," +
+								"part_man TEXT," +
+								"vehicle_model TEXT," +
+								"year TEXT," +
+								");");
+			}
+		} catch (SQLException e) {
+			System.out.println("SQLite Error: " + e.getMessage());
+		}
+			
+	}
+	
+	public void show_data_file() {		
+		String data_file_name = curr_configs.getDataFile().getName();
+		
+		System.out.println("===" + data_file_name + "===");
+		System.out.println(Constants.msg_parts);
+		
+		//Upload parts in to parts list from the Json data file
+		if(read_file_content()) {
+			//Print the content from the list
+			for (Part part : parts) {
+			    part.printPartData();
+			}
+			parts.clear();
+		}
+		
+		System.out.println(Constants.msg_menu_parts);
+	}
+	
+	public void add_part_to_database(Part part, File data_file) {
+		try (FileWriter fw = new FileWriter(data_file, true)){
+			fw.write(mapper.writeValueAsString(part));
+			fw.write("\n");
+			
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public File getDataFile() {
+		return curr_configs.getDataFile();
+	}
+	
+	private boolean read_file_content() {
+		try (BufferedReader reader = new BufferedReader(new FileReader(curr_configs.getDataFile()))) {
+		    String line;
+		    while ((line = reader.readLine()) != null) {
+		        Part part = mapper.readValue(line, Part.class);
+		        parts.add(part);
+		    }
+		} catch (FileNotFoundException e) {
+			System.out.println("Can't read file content");
+			return false;
+		} catch (IOException e) {
+			System.out.println("Database is empty");
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private void save_configs() {
+		try {
+			mapper.writerWithDefaultPrettyPrinter().writeValue(conf_file, curr_configs);
+			
+		} catch(IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+}
